@@ -1,0 +1,29 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "kopia-proxy": "lcp --proxyUrl http://127.0.0.1:51515 --credentials --origin http://localhost:3000",
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "nuxt": "^3.7.1"
+  },
+  "dependencies": {
+    "@invictus.codes/nuxt-vuetify": "^0.3.0",
+    "@mdi/font": "^7.2.96",
+    "@pinia-plugin-persistedstate/nuxt": "^1.1.1",
+    "@pinia/nuxt": "^0.4.11",
+    "@vueuse/core": "^10.4.1",
+    "@vueuse/nuxt": "^10.4.1",
+    "@vueuse/router": "^10.4.1",
+    "defu": "^6.1.2",
+    "local-cors-proxy": "^1.1.0",
+    "pretty-bytes": "^6.1.1",
+    "pretty-ms": "^8.0.0"
+  }
+}
