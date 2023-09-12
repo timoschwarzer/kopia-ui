@@ -72,6 +72,35 @@ type KopiaSnapshotManifest = {
   ping?: string[],
 }
 
+type KopiaEntryWithError = {
+  path: string,
+  error: string,
+}
+
+type KopiaDirectorySummary = {
+  size: number,
+  files: number,
+  symlinks: number,
+  dirs: number,
+  maxTime: number,
+  incomplete?: string,
+  numFailed: number,
+  numIgnoredErrors?: number,
+  errors?: KopiaEntryWithError[],
+}
+
+type KopiaSnapshot = {
+  id: string,
+  description: string,
+  startTime: ISOString,
+  endTime: ISOString,
+  incomplete: string,
+  summary: KopiaDirectorySummary,
+  rootID: string,
+  retention: string[],
+  pins: string[],
+}
+
 type KopiaTimeOfDay = {
   hour: number,
   minute: number,

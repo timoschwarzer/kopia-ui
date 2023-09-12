@@ -1,5 +1,5 @@
 <template>
-  <v-data-table density="compact" :items="displayedSources" :headers="headers" v-model:items-per-page="itemsPerPage">
+  <v-data-table density="compact" hover :items="displayedSources" :headers="headers" v-model:items-per-page="itemsPerPage" @click:row="onRowClicked">
     <template #item.__display.lastSnapshotDate="{item}">
       <template v-if="!!item.raw.upload">
         <v-progress-circular class="mr-1" size="16" color="accent" width="3" indeterminate />
@@ -91,6 +91,18 @@
       width: 250,
     }
   ]
+
+  function onRowClicked(event: MouseEvent, {item}: {item: {raw: KopiaSourceStatus}}) {
+    const router = useRouter()
+    router.push({
+      name: 'snapshots',
+      query: {
+        host: item.raw.source.host,
+        user: item.raw.source.userName,
+        path: item.raw.source.path,
+      }
+    })
+  }
 </script>
 
 <style lang="scss" scoped>
