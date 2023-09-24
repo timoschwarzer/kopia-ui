@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div>{{ prettyProcessedBytes }} / {{ prettyEstimatedBytes }}</div>
-    <v-progress-linear location="left" :model-value="progressPercentage" rounded />
+    <div>
+      {{ prettyProcessedBytes }}
+      <span v-if="processedBytes <= counters.estimatedBytes">/ {{ prettyEstimatedBytes }}</span>
+    </div>
+    <v-progress-linear location="left" :model-value="progressPercentage" :indeterminate="processedBytes > counters.estimatedBytes" rounded />
   </div>
 </template>
 
