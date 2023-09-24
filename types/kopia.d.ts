@@ -137,7 +137,7 @@ type KopiaSourceStatus = {
   nextSnapshotTime?: ISOString,
   schedule: string,
   source: KopiaSourceInfo,
-  status: string,  // TODO: Convert to enum
+  status: 'IDLE' | 'UPLOADING',  // TODO: Possibly more...
   upload?: KopiaUploadCounters,
   currentTask: string,
 }

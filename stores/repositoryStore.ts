@@ -23,11 +23,24 @@ export const useRepositoryStore = defineStore('repository', {
       const {data} = await useKopiaFetch<KopiaStatus>('repo/status')
       this.status = data.value
     },
-    async refreshSources() {
-      const {data} = await useKopiaFetch<{sources: KopiaSourceStatus[]}>('sources')
+    async refreshSources(query?: {user?: string, host?: string, path?: string}) {
+      const {data} = await useKopiaFetch<{sources: KopiaSourceStatus[]}>('sources', {
+        query: query,
+      })
 
       if (data.value) {
-        this.sources = data.value.sources
+        if (query?.host ?? query?.user ?? query?.path) {
+          // Delete all cached sources that match the query
+          this.sources = this.sources.filter(s => {
+            return !((query.host === undefined || s.source.host === query.host) &&
+              (query.user === undefined || s.source.userName === query.user) &&
+              (query.path === undefined || s.source.path === query.path))
+          })
+
+          this.sources.push(...data.value.sources)
+        } else {
+          this.sources = data.value.sources
+        }
       }
     },
   },

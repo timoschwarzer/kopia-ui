@@ -1,18 +1,28 @@
 <template>
   <v-container fluid>
-    <div v-if="snapshotsPending" class="d-flex justify-center py-10">
+    <div v-if="snapshotsPending && snapshots.length === 0" class="d-flex justify-center py-10">
       <v-progress-circular indeterminate />
     </div>
     <div v-else>
-      <h2 class="text-h5 mb-5">
-        Snapshots
-        <template v-if="path">
-          in <span class="font-weight-bold">{{ path }}</span>
+      <div class="d-flex flex-wrap">
+        <h2 class="text-h5 mb-5">
+          Snapshots
+          <template v-if="path">
+            in <span class="font-weight-bold">{{ path }}</span>
+          </template>
+          <template v-if="host">
+            on <span class="font-weight-bold"><template v-if="user">{{ user }}@</template>{{ host }}</span>
+          </template>
+        </h2>
+
+        <template v-if="isOwnHost">
+          <v-spacer />
+
+          <v-btn color="accent" :loading="snapshotRunning || snapshotNowLoading" @click="onSnapshotNowClicked">
+            Snapshot now
+          </v-btn>
         </template>
-        <template v-if="host">
-          on <span class="font-weight-bold"><template v-if="user">{{ user }}@</template>{{ host }}</span>
-        </template>
-      </h2>
+      </div>
 
       <div class="snapshots">
         <kopia-snapshot-card
@@ -28,13 +38,30 @@
 
 <script lang="ts" setup>
   import {useKopiaFetch} from '~/lib/useKopiaFetch'
+  import {useRepositoryStore} from '~/stores/repositoryStore'
 
   const route = useRoute()
   const router = useRouter()
 
-  const host = route.query.host
-  const user = route.query.user
-  const path = route.query.path
+  const repositoryStore = useRepositoryStore()
+
+  const host = toRef(route.query.host)
+  const user = toRef(route.query.user)
+  const path = toRef(route.query.path)
+
+  const snapshotQuery = computed(() => ({
+    user: String(user.value),
+    host: String(host.value),
+    path: String(path.value),
+  }))
+  const isOwnHost = computed(() => host.value === repositoryStore.status?.hostname)
+  const snapshotRunning = computed(() => repositoryStore.sources.some(s => {
+    return s.source.host === host.value &&
+      s.source.path === path.value &&
+      s.source.userName === user.value &&
+      s.status === 'UPLOADING'
+  }))
+  const snapshotNowLoading = ref(false)
 
   type KopiaSnapshotsResponse = {
     snapshots: KopiaSnapshot[],
@@ -43,9 +70,7 @@
   }
 
   const {data: snapshotsResponse, refresh: refreshSnapshots, pending: snapshotsPending} = await useKopiaFetch<KopiaSnapshotsResponse>("snapshots", {
-    query: {
-      host, user, path
-    },
+    query: snapshotQuery.value,
   })
 
   const snapshots = computed(() => {
@@ -56,8 +81,29 @@
     return snapshots
   })
 
+  useTimeoutPoll(async () => {
+    await repositoryStore.refreshSources(snapshotQuery.value)
+    await refreshSnapshots()
+  }, 2000, {immediate: true})
+
   function onSnapshotCardClicked(snapshot: KopiaSnapshot) {
-    router.push({name: 'browse', query: {name: path, object: snapshot.rootID}})
+    router.push({name: 'browse', query: {name: path.value, object: snapshot.rootID}})
+  }
+
+  async function onSnapshotNowClicked() {
+    snapshotNowLoading.value = true
+
+    await useKopiaFetch('sources/upload', {
+      method: 'POST',
+      query: {
+        userName: user.value,
+        host: host.value,
+        path: path.value,
+      }
+    })
+    await repositoryStore.refreshSources(snapshotQuery.value)
+
+    snapshotNowLoading.value = false
   }
 </script>
 
