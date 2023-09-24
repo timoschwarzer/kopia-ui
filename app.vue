@@ -20,7 +20,9 @@
       </template>
     </v-toolbar>
     <v-main>
-      <nuxt-page v-if="isLoggedIn" />
+      <keep-alive v-if="isLoggedIn" :max="3">
+        <nuxt-page />
+      </keep-alive>
       <div v-else-if="initialLoadComplete" class="ma-6 d-flex justify-center">
         <login-form />
       </div>

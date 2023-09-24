@@ -5,19 +5,20 @@
       :key="index"
       :entry="entry"
       :selected="isEntrySelected(entry)"
+      :disabled="disabled"
       draggable="true"
       @click="event => onItemClicked(event, entry, index)"
       @dblclick.prevent="onItemDoubleClicked(entry)"
       @dragstart="event => onItemDragStart(event, entry)"
     />
-
-    <template v-if="sortedTruncatedEntries.length === 0">
-      <div class="text-center empty-view py-12">
-        <v-icon icon="mdi-folder-open-outline" size="72"/>
-        <div class="text-overline">Nothing to show</div>
-      </div>
-    </template>
   </div>
+
+  <template v-if="sortedTruncatedEntries.length === 0">
+    <div class="text-center empty-view py-12">
+      <v-icon icon="mdi-folder-open-outline" size="72"/>
+      <div class="text-overline">Nothing to show</div>
+    </div>
+  </template>
 
   <v-btn v-if="entries.length > maxEntryCount" color="warning" variant="tonal" block @click="maxEntryCount += 1000">
     Showing {{ maxEntryCount }} of {{ entries.length }} items. Click to show more
@@ -28,9 +29,15 @@
   import {useUiSettingsStore} from '~/stores/uiSettingsStore'
   import {storeToRefs} from 'pinia'
 
-  const props = defineProps<{
-    entries: KopiaDirectoryEntry[],
-  }>()
+  const props = withDefaults(
+    defineProps<{
+      entries: KopiaDirectoryEntry[],
+      disabled?: boolean,
+    }>(),
+    {
+      disabled: false,
+    }
+  )
 
   const emit = defineEmits<{
     (e: 'open-entry', entry: KopiaDirectoryEntry): void,

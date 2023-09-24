@@ -1,7 +1,12 @@
 <template>
   <v-container fluid>
-    <v-progress-linear indeterminate :active="entriesPending" />
-    <kopia-object-browser :entries="entries" @open-entry="onOpenEntry" @drag-entry="onDragEntry" />
+    <v-breadcrumbs :items="breadcrumbs">
+      <template v-slot:divider>
+        <v-icon icon="mdi-chevron-right"></v-icon>
+      </template>
+    </v-breadcrumbs>
+
+    <kopia-object-browser :entries="entries" :disabled="entriesPending" @open-entry="onOpenEntry" @drag-entry="onDragEntry" />
   </v-container>
 </template>
 
@@ -10,15 +15,46 @@
   import {useConnectionSettingsStore} from '~/stores/connectionSettingsStore'
   import streamSaver from 'streamsaver'
 
+  type HierarchyEntry = {
+    name: string,
+    objectId: string,
+  }
+
   const route = useRoute()
   const router = useRouter()
 
-  const directoryId = computed(() => String(route.params.dir))
-  const objectUrl = computed(() => `objects/${directoryId.value}`)
   const connectionSettingsStore = useConnectionSettingsStore()
+  const objectId = computed(() => String(route.query.object))
+  const objectUrl = computed(() => `objects/${objectId.value}`)
 
   const {data: entriesResponse, refresh: refreshEntries, pending: entriesPending} = await useKopiaFetch<KopiaDirectoryManifest>(objectUrl)
   const entries = computed(() => entriesResponse.value?.entries ?? [])
+  const hierarchy = ref<HierarchyEntry[]>([])
+  const breadcrumbs = computed(() => hierarchy.value.map(h => ({
+    title: h.name,
+    to: {
+      name: 'browse',
+      query: {
+        object: h.objectId,
+      }
+    }
+  })))
+
+  watch(objectId, objectId => {
+    const index = hierarchy.value.findIndex(h => h.objectId === objectId)
+    if (index !== -1) {
+      hierarchy.value.splice(index + 1)
+    }
+  })
+
+  watch(() => route.query.name, (name, oldName) => {
+    if (name !== oldName) {
+      hierarchy.value.push({
+        name: String(name),
+        objectId: objectId.value,
+      })
+    }
+  }, {deep: true, immediate: true})
 
   function getEntryUrl(entry: KopiaDirectoryEntry) {
     const url = new URL(`objects/${entry.obj}`, connectionSettingsStore.sanitizedApiBaseUrl)
@@ -29,9 +65,10 @@
   function onOpenEntry(entry: KopiaDirectoryEntry) {
     if (entry.type === 'd') {
       router.push({
-        name: 'browse-dir',
-        params: {
-          dir: entry.obj,
+        name: 'browse',
+        query: {
+          name: entry.name,
+          object: entry.obj,
         }
       })
     } else {
@@ -72,7 +109,7 @@
 
   function onDragEntry(event: DragEvent, entry: KopiaDirectoryEntry) {
     // Drag & Drop files on Chrome. Only works if API and UI are on the same origin.
-
+    const url = getEntryUrl(entry)
     event.dataTransfer?.setData('DownloadURL', `application/octet-stream:${entry.name}:${url.toString()}`)
   }
 </script>

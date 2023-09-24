@@ -69,16 +69,16 @@ const {listViewSettings} = storeToRefs(uiSettingsStore)
 
 const headers = [
   {
-    title: 'Path',
-    key: 'source.path',
+    title: 'Host',
+    key: 'source.host',
   },
   {
     title: 'User',
     key: 'source.userName',
   },
   {
-    title: 'Host',
-    key: 'source.host',
+    title: 'Path',
+    key: 'source.path',
   },
   {
     title: 'Size',

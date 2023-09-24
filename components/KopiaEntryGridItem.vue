@@ -1,10 +1,17 @@
 <template>
   <v-tooltip open-delay="500" location="bottom">
     <template #activator="{props}">
-      <v-card :color="selected ? 'accent' : ''" class="pa-2" v-bind="{...$attrs, ...props}" :variant="selected ? 'flat' : 'text'" :ripple="false">
+      <v-card
+        :disabled="disabled"
+        :color="selected ? 'accent' : ''"
+        class="pa-2"
+        v-bind="{...$attrs, ...props}"
+        :variant="selected ? 'flat' : 'text'"
+        :ripple="false"
+      >
         <div class="thumbnail text-center">
-          <v-icon v-if="entry.type === 'd'" size="x-large" icon="mdi-folder" />
-          <v-icon v-else size="x-large" icon="mdi-file-outline" />
+          <v-icon v-if="entry.type === 'd'" size="x-large" icon="mdi-folder"/>
+          <v-icon v-else size="x-large" icon="mdi-file-outline"/>
         </div>
         <div class="entry-name text-center">{{ entry.name }}</div>
       </v-card>
@@ -23,10 +30,12 @@
     defineProps<{
       entry: KopiaDirectoryEntry,
       selected?: boolean,
+      disabled?: boolean,
     }>(),
     {
       selected: false,
-    }
+      disabled: false,
+    },
   )
 
   const {entry} = toRefs(props)

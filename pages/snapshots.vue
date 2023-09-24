@@ -19,6 +19,7 @@
           v-for="snapshot in snapshots"
           :key="snapshot.id"
           :snapshot="snapshot"
+          @click="onSnapshotCardClicked(snapshot)"
         />
       </div>
     </div>
@@ -29,6 +30,7 @@
   import {useKopiaFetch} from '~/lib/useKopiaFetch'
 
   const route = useRoute()
+  const router = useRouter()
 
   const host = route.query.host
   const user = route.query.user
@@ -53,6 +55,10 @@
     })
     return snapshots
   })
+
+  function onSnapshotCardClicked(snapshot: KopiaSnapshot) {
+    router.push({name: 'browse', query: {name: path, object: snapshot.rootID}})
+  }
 </script>
 
 <style lang="scss" scoped>

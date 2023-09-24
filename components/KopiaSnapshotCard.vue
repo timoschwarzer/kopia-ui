@@ -1,5 +1,5 @@
 <template>
-  <v-card class="d-flex flex-column pa-4" hover @click="$router.push({name: 'browse-dir', params: {dir: snapshot.rootID}})">
+  <v-card class="d-flex flex-column pa-4" hover v-bind="$attrs">
     <div class="font-weight-bold line-height-1">{{ snapshotDateRelative }}</div>
     <div class="text-caption">{{ snapshotDateFormatted }}</div>
     <div v-if="snapshot.description">{{ snapshot.description }}</div>
