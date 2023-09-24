@@ -2,6 +2,9 @@
 export default defineNuxtConfig({
   devtools: {enabled: true},
   ssr: false,
+  nitro: {
+    static: true,
+  },
   modules: [
     '@invictus.codes/nuxt-vuetify',
     '@pinia/nuxt',

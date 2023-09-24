@@ -8,9 +8,7 @@ export const useKopiaFetch: typeof useFetch = (url: string, options = {}) => {
     server: false,
 
     // set user token if connected
-    headers: connectionSettings.username
-      ? {Authorization: `Basic ${window.btoa(`${connectionSettings.username}:${connectionSettings.password}`)}`}
-      : {},
+    headers: connectionSettings.authenticationHeaders,
     ...options,
   })
 }

@@ -8,13 +8,16 @@ type KopiaStatus = {
   // TODO: Add missing fields
 }
 
-type KopiaEntrySummary = {
-  dirs: number,
-  files: number,
-  maxTime: ISOString,
-  numFailed: number,
+type KopiaDirectorySummary = {
   size: number,
+  files: number,
   symlinks: number,
+  dirs: number,
+  maxTime: number,
+  incomplete?: string,
+  numFailed: number,
+  numIgnoredErrors?: number,
+  errors?: KopiaEntryWithError[],
 }
 
 type KopiaDirectoryEntry = {
@@ -22,8 +25,18 @@ type KopiaDirectoryEntry = {
   mtime: ISOString,
   name: string,
   obj: string,
-  summ: KopiaEntrySummary,
-  type: string,
+  size?: number,
+  summ?: KopiaDirectorySummary,
+  type: 'f' | 'd',
+}
+
+type KopiaDirectoryManifest = {
+  /**
+   * @deprecated
+   */
+  stream: string,
+  entries: KopiaDirectoryEntry[],
+  summary: KopiaDirectorySummary,
 }
 
 type KopiaSourceInfo = {
@@ -75,18 +88,6 @@ type KopiaSnapshotManifest = {
 type KopiaEntryWithError = {
   path: string,
   error: string,
-}
-
-type KopiaDirectorySummary = {
-  size: number,
-  files: number,
-  symlinks: number,
-  dirs: number,
-  maxTime: number,
-  incomplete?: string,
-  numFailed: number,
-  numIgnoredErrors?: number,
-  errors?: KopiaEntryWithError[],
 }
 
 type KopiaSnapshot = {

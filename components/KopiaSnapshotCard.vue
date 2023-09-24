@@ -1,6 +1,7 @@
 <template>
-  <v-card class="d-flex flex-column pa-4" hover>
-    <div class="font-weight-bold">{{ snapshotDateFormatted }}</div>
+  <v-card class="d-flex flex-column pa-4" hover @click="$router.push({name: 'browse-dir', params: {dir: snapshot.rootID}})">
+    <div class="font-weight-bold line-height-1">{{ snapshotDateRelative }}</div>
+    <div class="text-caption">{{ snapshotDateFormatted }}</div>
     <div v-if="snapshot.description">{{ snapshot.description }}</div>
     <div class="d-flex flex-wrap mt-2 tags">
       <kopia-tag v-for="retentionTag in snapshot.retention" :tag="retentionTag" :key="retentionTag" />
@@ -38,6 +39,7 @@
   const prettySummarySize = usePrettyBytes(snapshot.value.summary.size)
   const snapshotDate = useToDate(snapshot.value.startTime)
   const snapshotDateFormatted = useFormatDate(snapshotDate, "PPPp")
+  const snapshotDateRelative = useTimeAgo(snapshotDate)
 </script>
 
 <style lang="scss" scoped>
@@ -48,5 +50,9 @@
   .summary {
     gap: 0.6em;
     font-size: 0.8em;
+  }
+
+  .line-height-1 {
+    line-height: 1;
   }
 </style>

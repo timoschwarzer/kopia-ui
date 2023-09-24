@@ -12,6 +12,16 @@ export const useConnectionSettingsStore = defineStore('connection-settings', {
     username: '',
     password: '',
   }),
+  getters: {
+    sanitizedApiBaseUrl(): string {
+      return this.apiBaseUrl + (!this.apiBaseUrl.endsWith('/') ? '/' : '')
+    },
+    authenticationHeaders(): {[header: string]: string} {
+      return this.username
+        ? {Authorization: `Basic ${window.btoa(`${this.username}:${this.password}`)}`}
+        : {}
+    }
+  },
   persist: [
     {
       paths: ['apiBaseUrl', 'username'],

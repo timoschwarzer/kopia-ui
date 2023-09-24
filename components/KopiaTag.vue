@@ -1,5 +1,5 @@
 <template>
-  <v-chip :color="tagColor" label density="comfortable">
+  <v-chip :color="tagColor" label :variant="pin ? 'flat' : 'tonal'" density="comfortable">
     <template v-if="pin" #prepend>
       <v-icon size="16" icon="mdi-pin-outline" class="pin-icon mr-1" />
     </template>
@@ -11,15 +11,18 @@
   const props = withDefaults(
     defineProps<{
       tag: string,
-      pin: boolean,
+      pin?: boolean,
     }>(), {
       pin: false,
     }
   )
 
-  const {tag} = toRefs(props)
+  const {tag, pin} = toRefs(props)
 
   const tagColor = computed(() => {
+    if (pin.value) {
+      return 'yellow'
+    }
     if (tag.value.startsWith('latest-')) {
       return 'green'
     }
