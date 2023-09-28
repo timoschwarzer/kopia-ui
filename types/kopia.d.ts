@@ -141,3 +141,95 @@ type KopiaSourceStatus = {
   upload?: KopiaUploadCounters,
   currentTask: string,
 }
+
+type KopiaRetentionPolicy = {
+  keepLatest?: number,
+  keepHourly?: number,
+  keepDaily?: number,
+  keepWeekly?: number,
+  keepMonthly?: number,
+  keepAnnual?: number,
+  ignoreIdenticalSnapshots?: boolean,
+}
+
+type KopiaFilesPolicy = {
+  ignoreRules?: string[],
+  noParentIgnore?: boolean,
+  ignoreDotFiles?: string[],
+  noParentDotFiles?: boolean,
+  ignoreCacheDirs?: boolean,
+  maxFileSize?: number,
+  oneFileSystem?: boolean,
+}
+
+type KopiaErrorHandlingPolicy = {
+  ignoreFileErrors?: boolean,
+  ignoreDirectoryErrors?: boolean,
+  ignoreUnknownTypes?: boolean,
+}
+
+type KopiaCompressionPolicy = {
+  compressorName?: string,
+  onlyCompress?: string[]
+  noParentOnlyCompress?: boolean,
+  neverCompress?: string[],
+  noParentNeverCompress?: boolean,
+  minSize?: number,
+  maxSize?: number,
+}
+
+type KopiaActionCommand = {
+  path?: string,
+  args?: string[],
+  script?: string,
+  timeout?: number,
+  mode?: 'essential' | 'optional' | 'async',
+}
+
+type KopiaActionsPolicy = {
+  beforeFolder?: KopiaActionCommand,
+  afterFolder?: KopiaActionCommand,
+  beforeSnapshotRoot?: KopiaActionCommand,
+  afterSnapshotRoot?: KopiaActionCommand,
+}
+
+enum KopiaLogDetail {
+  None = 0,
+  Normal = 5,
+  Max = 10,
+}
+
+type KopiaDirLoggingPolicy = {
+  snapshotted?: KopiaLogDetail,
+  ignored?: KopiaLogDetail,
+}
+
+type KopiaEntryLoggingPolicy = {
+  snapshotted?: KopiaLogDetail,
+  ignored?: KopiaLogDetail,
+  cacheHit?: KopiaLogDetail,
+  cacheMiss?: KopiaLogDetail,
+}
+
+type KopiaLoggingPolicy = {
+  directories?: KopiaDirLoggingPolicy,
+  entries?: KopiaEntryLoggingPolicy,
+}
+
+type KopiaUploadPolicy = {
+  maxParallelSnapshots?: number,
+  maxParallelFileReads?: number,
+  parallelUploadAboveSize?: number,
+}
+
+type KopiaPolicy = {
+  retention?: KopiaRetentionPolicy,
+  files?: KopiaFilesPolicy,
+  errorHandling?: KopiaErrorHandlingPolicy,
+  scheduling?: KopiaSchedulingPolicy,
+  compression?: KopiaCompressionPolicy,
+  actions?: KopiaActionsPolicy,
+  logging?: KopiaLoggingPolicy,
+  upload: KopiaUploadPolicy,
+  noParent?: boolean,
+}
