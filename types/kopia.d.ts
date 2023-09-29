@@ -230,6 +230,6 @@ type KopiaPolicy = {
   compression?: KopiaCompressionPolicy,
   actions?: KopiaActionsPolicy,
   logging?: KopiaLoggingPolicy,
-  upload: KopiaUploadPolicy,
+  upload?: KopiaUploadPolicy,
   noParent?: boolean,
 }
