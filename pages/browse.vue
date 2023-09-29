@@ -1,10 +1,15 @@
 <template>
   <v-container fluid>
-    <v-breadcrumbs :items="breadcrumbs">
-      <template #divider>
-        <v-icon icon="mdi-chevron-right"></v-icon>
-      </template>
-    </v-breadcrumbs>
+    <div class="overflow-x">
+      <v-breadcrumbs :items="breadcrumbs">
+        <template #divider>
+          <v-icon icon="mdi-chevron-right"></v-icon>
+        </template>
+        <template #title="{item, index}">
+          <span :ref="el => breadcrumbsElements[index] = el">{{ item.title }}</span>
+        </template>
+      </v-breadcrumbs>
+    </div>
 
     <kopia-object-browser :entries="entries" :disabled="entriesPending || resolvingHierarchy" @open-entry="onOpenEntry" @drag-entry="onDragEntry" />
   </v-container>
@@ -26,37 +31,37 @@
   const router = useRouter()
 
   const connectionSettingsStore = useConnectionSettingsStore()
+  const rootPath = computed(() => String(route.query.rootPath))
   const path = computed(() => String(route.query.path))
   const pathSegments = computed<string[]>(() => {
-    const segments = []
-    let prependFirstSegment = ''
-
-    for (let pathElement of path.value.split(PATH_SEPARATOR)) {
-      if (segments.length === 0) {
-        if (pathElement.length === 0) {
-          prependFirstSegment += PATH_SEPARATOR
-        } else {
-          segments.push(prependFirstSegment + pathElement)
-        }
-
-        continue
-      }
-
-      segments.push(pathElement)
-    }
-
-    return segments
+    return path.value.split(PATH_SEPARATOR).filter(p => p !== '')
   })
   const rootObjectId = computed(() => String(route.query.root))
   const objectId = computed(() => String(route.query.object))
   const objectUrl = computed(() => getObjectApiUrl(objectId.value))
   const resolvingHierarchy = ref(false)
+  const breadcrumbsElements = ref<HTMLElement[]>([])
 
   const {data: entriesResponse, refresh: refreshEntries, pending: entriesPending} = await useKopiaFetch<KopiaDirectoryManifest>(objectUrl)
   const entries = computed(() => entriesResponse.value?.entries ?? [])
   const hierarchy = ref<HierarchyEntry[]>([])
+
   const breadcrumbs = computed(() => {
     const breadcrumbs = []
+
+    breadcrumbs.push({
+      title: rootPath.value,
+      disabled: !rootObjectId.value,
+      to: {
+        name: 'browse',
+        query: {
+          path: '',
+          object: rootObjectId.value,
+          root: rootObjectId.value,
+          rootPath: rootPath.value,
+        }
+      },
+    })
 
     const pathSegments = []
     for (const hierarchyEntry of hierarchy.value) {
@@ -71,6 +76,7 @@
             path: pathSegments.join(PATH_SEPARATOR),
             object: hierarchyEntry.objectId,
             root: rootObjectId.value,
+            rootPath: rootPath.value,
           }
         },
       })
@@ -88,24 +94,27 @@
 
       if (hierarchyEntry.name !== pathSegment) {
         hierarchyEntry.name = pathSegment
-
-        if (i === 0 && rootObjectId.value) {
-          hierarchyEntry.objectId = rootObjectId.value
-        } else {
-          hierarchyEntry.objectId = null  // Mark as dirty
-        }
+        hierarchyEntry.objectId = null  // Mark as dirty
       }
     }
 
     for (let i = hierarchy.value.length; i < segments.length; i++) {
       hierarchy.value.push({
         name: segments[i],
-        objectId: i === 0 ? rootObjectId.value ?? null : null,
+        objectId: null,
       })
     }
 
     updateMissingHierarchyObjects()
   }, {deep: true, immediate: true})
+
+  watch(breadcrumbs, () => {
+    breadcrumbsElements.value[breadcrumbsElements.value.length - 1]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+      inline: 'end',
+    })
+  }, {flush: 'post'})
 
   function getObjectApiUrl(objectId: string) {
     return `objects/${objectId}`
@@ -119,7 +128,7 @@
 
     resolvingHierarchy.value = true
 
-    let parentEntryObjectId: string | null = null
+    let parentEntryObjectId: string | null = rootObjectId.value ?? null
     for (const hierarchyEntry of hierarchy.value) {
       if (!hierarchyEntry.objectId) {
         if (!parentEntryObjectId) {
@@ -158,9 +167,10 @@
       router.push({
         name: 'browse',
         query: {
-          path: path.value + PATH_SEPARATOR + entry.name,
+          path: (path.value ? `${path.value}${PATH_SEPARATOR}` : '') + entry.name,
           object: entry.obj,
           root: rootObjectId.value,
+          rootPath: rootPath.value,
         }
       })
     } else {
@@ -207,5 +217,8 @@
 </script>
 
 <style lang="scss" scoped>
-
+  .overflow-x {
+    white-space: nowrap;
+    overflow-x: auto;
+  }
 </style>

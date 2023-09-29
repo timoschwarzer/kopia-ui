@@ -87,7 +87,7 @@
   }, 2000, {immediate: true})
 
   function onSnapshotCardClicked(snapshot: KopiaSnapshot) {
-    router.push({name: 'browse', query: {path: path.value, object: snapshot.rootID, root: snapshot.rootID}})
+    router.push({name: 'browse', query: {rootPath: path.value, path: '', object: snapshot.rootID, root: snapshot.rootID}})
   }
 
   async function onSnapshotNowClicked() {
