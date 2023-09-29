@@ -11,7 +11,7 @@
       </v-breadcrumbs>
     </div>
 
-    <kopia-object-browser :entries="entries" :disabled="entriesPending || resolvingHierarchy" @open-entry="onOpenEntry" @drag-entry="onDragEntry" />
+    <kopia-object-browser :entries="entries" :disabled="entriesPending" @open-entry="onOpenEntry" @drag-entry="onDragEntry" />
   </v-container>
 </template>
 
