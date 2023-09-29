@@ -82,7 +82,7 @@ export function useOptionalObjectValue<T, PathType extends string[]>(object: May
       return obj as Get<T, PathType>
     },
     set(newValue) {
-      if (isUndefined(newValue)) {
+      if (isEmptyFn(newValue)) {
         let firstMissingPropertyIndex = 0
         let objHierarchy: [any] = [objectRef.value]
         for (let i = 0; i < propertyChain.length; i++) {
