@@ -40,7 +40,18 @@ export const isFalsy = (v: any) => !v
  * // }
  * //
  * // myObject.value.foo.bar was removed and myObject.value.foo was
- * // removed since it was an empty object afterwards
+ * // removed since it was an empty object after that.
+ *
+ * bar.value = 42
+ *
+ * // myObject.value is {
+ * //   foo: {
+ * //     bar: 42,
+ * //   },
+ * //   baz: 5,
+ * // }
+ * //
+ * // All missing nested objects have been created automatically and the set value is assigned to the target property.
  * ```
  *
  *
