@@ -106,7 +106,7 @@ const headers = [
 function onRowClicked(event: MouseEvent, {item}: { item: { raw: KopiaSourceStatus } }) {
   const router = useRouter()
   router.push({
-    name: 'snapshots',
+    name: 'snapshots-list',
     query: {
       host: item.raw.source.host,
       user: item.raw.source.userName,

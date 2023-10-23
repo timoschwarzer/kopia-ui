@@ -10,9 +10,9 @@
           Log out
         </v-btn>
       </v-toolbar-items>
-      <template v-if="isLoggedIn" v-slot:extension>
+      <template v-if="isLoggedIn" #extension>
         <v-tabs class="mx-auto">
-          <v-tab :to="{name: 'index'}">Sources</v-tab>
+          <v-tab :to="{name: 'snapshots'}">Snapshots</v-tab>
           <v-tab :to="{name: 'policies'}">Policies</v-tab>
           <v-tab :to="{name: 'tasks'}">Tasks</v-tab>
           <v-tab :to="{name: 'repository'}">Repository</v-tab>

@@ -15,13 +15,15 @@
           </template>
         </h2>
 
-        <template v-if="isOwnHost">
-          <v-spacer />
+        <v-spacer />
 
-          <v-btn color="accent" :loading="snapshotRunning || snapshotNowLoading" @click="onSnapshotNowClicked">
-            Snapshot now
-          </v-btn>
-        </template>
+        <v-btn :to="{name: 'policies-edit', query: {user, host, path}}">
+          Edit Policy
+        </v-btn>
+
+        <v-btn v-if="isOwnHost" color="accent" :loading="snapshotRunning || snapshotNowLoading" @click="onSnapshotNowClicked">
+          Snapshot now
+        </v-btn>
       </div>
 
       <div class="snapshots">
